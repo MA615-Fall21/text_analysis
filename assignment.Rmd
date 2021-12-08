@@ -134,7 +134,7 @@ bing_and_nrc <- bind_rows(
 
 ```
 
-```{r, message=FALSE,, include = TRUE, fig.cap = "Comparison of sentiment ratings based on lexicon. Each bar represents the sum of word sentiments in groups of 25 lines. Note that around index 250 (or around line 6250) there is a distinct group of negiive sentiments identified in all four lexicons.",fig.width=6.5, fig.height=5}
+```{r, message=FALSE,, include = TRUE, fig.cap = "Comparison of sentiment ratings based on lexicon. Each bar represents the sum of word sentiments in groups of 25 lines. Note that around index 250 (or around line 6250) there is a distinct group of negiive sentiments identified in all four lexicons.",fig.width=6.5, fig.height=4}
 #read in new lexicon and join with existing text data
 adj <- read_tsv("lexicons/adjectives/1890.tsv",col_names = c("word", "mean", "sd"))
 freq <- read_tsv("lexicons/frequent_words/1890.tsv",col_names = c("word", "mean", "sd"))
@@ -204,7 +204,7 @@ Both of these sentences are clearly negative and are coded as such. The paragrap
 
 
 
-```{r, fig.cap = "Sentence level sentment grouped by paragraph. The pattern is similar to others that use a bag of words analysis, but the pattern is not the same. The orange bars represent the two chapters where Dorian kills Basil. Here some negative sentiment is detected, but these are not the most negative paragraphs identified.", fig.width=7.5, fig.height=5.5, include = TRUE}
+```{r, fig.cap = "Sentence level sentment grouped by paragraph. The pattern is similar to others that use a bag of words analysis, but the pattern is not the same. The orange bars represent the two chapters where Dorian kills Basil. Here some negative sentiment is detected, but these are not the most negative paragraphs identified.", fig.width=7.5, fig.height=4, include = TRUE}
 p_sent <- sentences %>%  group_by(index = para) %>% 
   summarise(sentiment = mean(sentiment),
             wc = sum(word_count), 
@@ -235,8 +235,8 @@ dorian_sibyl <-sentences %>% filter(grepl("Dorian|Gray",string.value))%>%  filte
 ```
 
 ## Histograms of character sentiments
-I selected four of the main characers, and using the sentence sentiment values created histograms for the sentiment of sentences that mention the character's name. This method is not without fault though, since I do not identify sentences such as, "As a rule, he is charming to me, and we sit in the studio and talk of a thousand things" where Basil is describing his friendship with Dorian, because Basil only refers to Dorian as "he" rather than by his name. 
-```{r, fig.height= 5, fig.width=8, "Character sentiment histograms. The vertical line represents the average sentiment for sentences that contain character's name.", include = TRUE }
+I selected four of the main characters, and using the sentence sentiment values created histograms for the sentiment of sentences that mention the character's name. This method is not without fault though, since I do not identify sentences such as, "As a rule, he is charming to me, and we sit in the studio and talk of a thousand things" where Basil is describing his friendship with Dorian, because Basil only refers to Dorian as "he" rather than by his name. 
+```{r, fig.height= 4, fig.width=7, "Character sentiment histograms. The vertical line represents the average sentiment for sentences that contain character's name.", include = TRUE }
 d <- ggplot(dorian)+
   geom_histogram(mapping = aes(x = sentiment), binwidth=0.05, fill = "#999999", color = "white") +
   geom_vline(xintercept = mean(dorian$sentiment), color = "#666666", size = 1)+
@@ -265,7 +265,7 @@ ggarrange(d,lh,b,s, ncol = 1, align = "hv")
 
 Next, I plotted the character sentiment over time. The light gray bars represent all of the text and the black bars represent the text where the character is called by name. Some patterns arise that inform the plot of the book. For example, Dorian is the main character since there are sentences that refer to him throughout the text. We can also see where Sibyl dies approximately half way through the text in her plot since there is a strong negative sentiment identified. 
 
-```{r, fig.cap="Timeline of sentence sentiment colored by character occurance", fig.width=7.5, fig.height=7.5/1.682, include = TRUE}
+```{r, fig.cap="Timeline of sentence sentiment colored by character occurance", fig.width=7, fig.height=4, include = TRUE}
 d_time <- ggplot(dorian)+
   geom_bar(data = sentences, mapping = aes(x = element_id, y = sentiment), color = "snow3",  stat = "Identity")+
   geom_bar(mapping = aes(x = element_id, y = sentiment), fill = "#999999", color = "black", stat = "Identity") +
@@ -301,7 +301,7 @@ I would be curious to extract information about how characters feel about eachot
 unbearable, and that he had yet borne with patience. The murder had been
 simply the madness of a moment."
 
-```{r fig.cap = "Co-occurance of character's sentiment histogram", fig.width=7.5, fig.height=7.5/1.682, include = TRUE}
+```{r fig.cap = "Co-occurance of character's sentiment histogram", fig.width=7, fig.height=4, include = TRUE}
 dlh <- ggplot(dorian_henry)+
   geom_histogram(mapping = aes(x = sentiment), binwidth=0.05, fill = "#9691E6", color = "white") +
   geom_vline(xintercept = mean(lhenry$sentiment), color = "#7570B3", size = 1)+
