@@ -1,12 +1,11 @@
 ---
 title: "Text Analysis of The Picture of Dorian Gray"
 author: "Rose Determan"
-date: "12/6/2021"
 output: pdf_document
 ---
 
 ```{r setup, include=FALSE,message=FALSE,results='hide', include = FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE,include=FALSE,message=FALSE,results='hide', include = FALSE, warning = FALSE)
 
 #imports ----------------------------------------------------------------------#
 pacman::p_load(gutenbergr, tidyverse, tidytext, textdata, magrittr, dplyr,sentimentr, tnum,ggpubr)
@@ -58,12 +57,13 @@ count <- tidy_text %>%
                   "Noun", "Noun", "Verb"))
 ```
 
-Figure 1 shows the count of the most common non-stop words in the Picture of Dorian Gray.  As we might expect words related to characters are most common. Interestingly the word "round" is one of the most common words. In the novel, Wilde does not use round as an adjective, but rather as a preposition, for example, "I turned half-way round, and saw Dorian Gray for the first time." 
+
 ```{r, fig.cap="The most common words (n>75) used in The Picture of Dorian Gray color coded by part of speech.", fig.width=7.5, fig.height=7.5/1.682, include = TRUE}
 ggplot(data = count, aes(n, word, fill = part_of_speech)) +
   geom_col() +
   labs(y = NULL)+ theme_minimal() 
 ```
+Figure 1 shows the count of the most common non-stop words in the Picture of Dorian Gray.  As we might expect words related to characters are most common. Interestingly the word "round" is one of the most common words. In the novel, Wilde does not use round as an adjective, but rather as a preposition, for example, "I turned half-way round, and saw Dorian Gray for the first time." 
 
 ## Sentiment Flow with lexicons
 First using the Bing lexicon, I calculated the overall sentiment of the text. The Bing lexicon assigns a positive or negative sentiment to words. For example "beautiful" is coded as positive, and "corrupt" is coded as negative. If there are more negative words, as is true in *The Picture of Dorian Gray*, the result is a negative integer. 
@@ -133,13 +133,8 @@ bing_and_nrc <- bind_rows(
   mutate(sentiment = positive - negative)
 
 ```
-## Extra Lexicon and visualizations
-I've selected a lexicon that has common words from each decade.Words have changed meaning over time and in a sentiment analysis these differences should be considered. Since *The Picture of Dorian Gray* was published in 1890, I've selected the lexicon for the decade 1890. The lexicon can be accessed from the following link: *https://nlp.stanford.edu/projects/socialsent/*.  
 
-Based on Figure 2, the lexicon with words and sentiments from 1890 matches well with the other lexicons. There are slight variations, as we would expect, but the trends are largely the same. The shared pattern is more distinct in the second half of the text. The average sentiment based on the year specific lexicon is 0.02, which suggests a slightly positive sentiment. This lexicon identifies "admirable", "beauty", and "fine" as the strongest positive words, and "cruelty", "terrible", and "wicked" as the strongest negitive words. 
- 
-William L. Hamilton, Kevin Clark, Jure Leskovec, and Dan Jurafsky. Inducing Domain-Specific Sentiment Lexicons from Unlabeled Corpora. ArXiv preprint (arxiv:1606.02820). 2016. https://nlp.stanford.edu/projects/socialsent/
-```{r, message=FALSE,, include = TRUE, fig.cap = "Comparison of sentiment ratings based on lexicon. Each bar represents the sum of word sentiments in groups of 25 lines. Note that around index 250 (or around line 6250) there is a distinct group of negiive sentiments identified in all four lexicons.",fig.width=7.5, fig.height=7.5/1.682}
+```{r, message=FALSE,, include = TRUE, fig.cap = "Comparison of sentiment ratings based on lexicon. Each bar represents the sum of word sentiments in groups of 25 lines. Note that around index 250 (or around line 6250) there is a distinct group of negiive sentiments identified in all four lexicons.",fig.width=6.5, fig.height=5}
 #read in new lexicon and join with existing text data
 adj <- read_tsv("lexicons/adjectives/1890.tsv",col_names = c("word", "mean", "sd"))
 freq <- read_tsv("lexicons/frequent_words/1890.tsv",col_names = c("word", "mean", "sd"))
@@ -160,7 +155,12 @@ bind_rows(new, afinn, bing_and_nrc) %>%
   facet_wrap(~method, ncol = 1, scales = "free_y")+ labs(title = "Comparison of Lexicons (including new)")
 ```
  
+## Extra Lexicon
+I've selected a lexicon that has common words from each decade.Words have changed meaning over time and in a sentiment analysis these differences should be considered. Since *The Picture of Dorian Gray* was published in 1890, I've selected the lexicon for the decade 1890. The lexicon can be accessed from the following link: *https://nlp.stanford.edu/projects/socialsent/*.  
 
+Based on Figure 2, the lexicon with words and sentiments from 1890 matches well with the other lexicons. There are slight variations, as we would expect, but the trends are largely the same. The shared pattern is more distinct in the second half of the text. The average sentiment based on the year specific lexicon is 0.02, which suggests a slightly positive sentiment. This lexicon identifies "admirable", "beauty", and "fine" as the strongest positive words, and "cruelty", "terrible", and "wicked" as the strongest negitive words. 
+ 
+William L. Hamilton, Kevin Clark, Jure Leskovec, and Dan Jurafsky. Inducing Domain-Specific Sentiment Lexicons from Unlabeled Corpora. ArXiv preprint (arxiv:1606.02820). 2016. https://nlp.stanford.edu/projects/socialsent/
 
 # Sentence Level Analysis
 ## Methods  
@@ -204,7 +204,7 @@ Both of these sentences are clearly negative and are coded as such. The paragrap
 
 
 
-```{r, fig.cap = "Sentence level sentment grouped by paragraph. The pattern is similar to others that use a bag of words analysis, but the pattern is not the same. The orange bars represent the two chapters where Dorian kills Basil. Here some negative sentiment is detected, but these are not the most negative paragraphs identified.", fig.width=7.5, fig.height=7.5/1.682, include = TRUE}
+```{r, fig.cap = "Sentence level sentment grouped by paragraph. The pattern is similar to others that use a bag of words analysis, but the pattern is not the same. The orange bars represent the two chapters where Dorian kills Basil. Here some negative sentiment is detected, but these are not the most negative paragraphs identified.", fig.width=7.5, fig.height=5.5, include = TRUE}
 p_sent <- sentences %>%  group_by(index = para) %>% 
   summarise(sentiment = mean(sentiment),
             wc = sum(word_count), 
